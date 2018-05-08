@@ -4,9 +4,34 @@ from transforms import *
 from torch.nn.init import normal, constant
 from my_model.group_norm import GroupNorm2d
 
+# 根据需要改load函数
+def try_load_state_dict(self, state_dict, strict=True):
+    from torch.nn.parameter import Parameter
+    own_state = self.state_dict()
+    for name, param in state_dict.items():
+        newname = name.replace('module.base_model.', '')
+        if newname in own_state:
+            if isinstance(param, Parameter):
+                # backwards compatibility for serialized parameters
+                param = param.data
+            try:
+                own_state[newname].copy_(param)
+            except Exception:
+                raise RuntimeError('While copying the parameter named {}, '
+                                   'whose dimensions in the model are {} and '
+                                   'whose dimensions in the checkpoint are {}.'
+                                   .format(name, own_state[name].size(), param.size()))
+        elif strict:
+            raise KeyError('unexpected key "{}" in state_dict'
+                           .format(name))
+    if strict:
+        missing = set(own_state.keys()) - set(state_dict.keys())
+        if len(missing) > 0:
+            raise KeyError('missing keys in state_dict: "{}"'.format(missing))
+
 class TSN(nn.Module):
-    def __init__(self, num_class, num_segments, modality,
-                 base_model='resnet101', new_length=None,
+    def __init__(self, num_class=201, num_segments=3, modality='RGB',
+                 base_model='resnet152', new_length=None,
                  consensus_type='avg', before_softmax=True,
                  dropout=0.8,
                  crop_num=1, partial_bn=True, use_GN=True):
@@ -91,7 +116,7 @@ TSN Configurations:
             pretrained_dict = {k:v for k,v in pretrained_dict.items() if k in model_dict}
             model_dict.update(pretrained_dict)
             self.base_model.load_state_dict(model_dict)
-            print self.base_model.state_dict()
+            print(self.base_model.state_dict())
             self.base_model.last_layer_name = 'fc'
             self.input_size = 224
             self.input_mean = [0.485, 0.456, 0.406]
@@ -104,7 +129,15 @@ TSN Configurations:
                 self.input_mean = [0.485, 0.456, 0.406] + [0] * 3 * self.new_length
                 self.input_std = self.input_std + [np.mean(self.input_std) * 2] * 3 * self.new_length
         elif 'resnet101' in base_model or 'resnet152' in base_model:
-            self.base_model = getattr(torchvision.models, base_model)(True)
+            self.base_model = getattr(torchvision.models, base_model)(False)
+            # 提特征
+            self.base_model.try_load_state_dict = try_load_state_dict
+            self.base_model.try_load_state_dict(self.base_model,torch.load('/mnt/workspace/model/resnet152_30e_72.65p.pth.tar')['state_dict'], strict=False)
+            # 调整最后一层
+            self.base_model.fc = nn.Linear(2048, 201)
+            # 删除多余的函数
+            del self.base_model.try_load_state_dict
+
             self.base_model.last_layer_name = 'fc'
             self.input_size = 224
             self.input_mean = [0.485, 0.456, 0.406]
@@ -154,9 +187,9 @@ TSN Configurations:
         else:
             raise ValueError('Unknown base model: {}'.format(base_model))
 
-        if self._enable_gn:
-            self._replace_bn_with_gn(self.base_model)
-            print("enable GN:",self.base_model)
+        #if self._enable_gn:
+            #self._replace_bn_with_gn(self.base_model)
+            #print("enable GN:",self.base_model)
 
 
     def _replace_bn_with_gn(self, model):
@@ -364,3 +397,9 @@ TSN Configurations:
         elif self.modality == 'RGBDiff':
             return torchvision.transforms.Compose([GroupMultiScaleCrop(self.input_size, [1, .875, .75]),
                                                    GroupRandomHorizontalFlip(is_flow=False)])
+
+
+if __name__ == '__main__':
+    model = TSN()
+    #....
+

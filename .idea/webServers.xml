@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="ceec7fcc-3f1e-40cf-bc1b-70db50812038" name="tsn" url="http://alvps.ckboss.science">
+        <fileTransfer host="alvps.ckboss.science" port="7024" rootFolder="/mnt/workspace/Code/tsn-pytorch" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="7024" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

@@ -1,9 +1,9 @@
 import argparse
 parser = argparse.ArgumentParser(description="PyTorch implementation of Temporal Segment Networks")
-parser.add_argument('dataset', type=str, choices=['ucf101', 'hmdb51', 'kinetics', 'ucf-crime'])
+parser.add_argument('dataset', type=str, choices=['ucf101', 'hmdb51', 'kinetics', 'ucf-crime', 'activitynet'])
 parser.add_argument('modality', type=str, choices=['RGB', 'Flow', 'RGBDiff'])
-parser.add_argument('train_list', type=str)
-parser.add_argument('val_list', type=str)
+parser.add_argument('train_list', type=str, default='/mnt/workspace/activitynet_train_list.txt')
+parser.add_argument('val_list', type=str, default='/mnt/workspace/activitynet_val_list.txt')
 
 # ========================= Model Configs ==========================
 parser.add_argument('--arch', type=str, default="resnet101")
@@ -20,7 +20,7 @@ parser.add_argument('--loss_type', type=str, default="nll",
 # ========================= Learning Configs ==========================
 parser.add_argument('--epochs', default=45, type=int, metavar='N',
                     help='number of total epochs to run')
-parser.add_argument('-b', '--batch-size', default=256, type=int,
+parser.add_argument('-b', '--batch-size', default=64, type=int,
                     metavar='N', help='mini-batch size (default: 256)')
 parser.add_argument('--lr', '--learning-rate', default=0.001, type=float,
                     metavar='LR', help='initial learning rate')

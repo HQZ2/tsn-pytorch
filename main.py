@@ -29,6 +29,8 @@ def main():
         num_class = 400
     elif args.dataset == 'ucf-crime':
         num_class = 14
+    elif args.dataset == 'activitynet':
+        num_class = 201
     else:
         raise ValueError('Unknown dataset '+args.dataset)
 
@@ -147,7 +149,7 @@ def main():
                 'arch': args.arch,
                 'state_dict': model.state_dict(),
                 'best_prec1': best_prec1,
-            }, is_best)
+            }, epoch, is_best)
 
 
 def train(train_loader, model, criterion, optimizer, epoch):
@@ -157,10 +159,10 @@ def train(train_loader, model, criterion, optimizer, epoch):
     top1 = AverageMeter()
     top5 = AverageMeter()
 
-    if args.use_partialbn:
-        model.module.partialBN(True)
-    else:
-        model.module.partialBN(False)
+    # if args.use_partialbn:
+    #     model.module.partialBN(True)
+    # else:
+    #     model.module.partialBN(False)
 
     # switch to train mode
     model.train()
@@ -257,11 +259,11 @@ def validate(val_loader, model, criterion, iter, logger=None):
     return top1.avg
 
 
-def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
-    filename = '_'.join((args.snapshot_pref, args.modality.lower(), filename))
+def save_checkpoint(state, epoch, is_best):
+    filename = '_'.join((args.snapshot_pref, args.modality.lower(), 'checkpoint_{:03d}.pth.tar'.format(epoch)))
     torch.save(state, filename)
     if is_best:
-        best_name = '_'.join((args.snapshot_pref, args.modality.lower(), 'model_best.pth.tar'))
+        best_name = '_'.join((args.snapshot_pref, args.modality.lower(), 'model_best_{:03d}.pth.tar'.format(epoch)))
         shutil.copyfile(filename, best_name)
 
 
