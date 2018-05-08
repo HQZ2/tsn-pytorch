@@ -29,8 +29,11 @@ def generdate_frame_info():
             label = anno['label']
             break
         vid2 = 'v_{}.mp4'.format(vid)
-        duration = frames_num[vid2]
-        info.append((os.path.join(VIDEO_PATH, vid2), duration, label))
+        try:
+            num = frames_num[vid2]
+        except:
+            continue
+        info.append((os.path.join(VIDEO_PATH, vid2), num, label))
     return info
 
 
