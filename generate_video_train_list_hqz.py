@@ -6,9 +6,14 @@ ACTNET200V13_PKL = '/mnt/workspace/pkls/actNet200-V1-3.pkl'
 VIDEO_PATH = '/mnt/workspace/activitynet-frames/resized-activitynet-frames'
 
 
-def load_groundtruth():
+def generdate_frame_info(vids, groundtruth):
+    with open(FRAMES_NUM_PKL, 'rb') as f:
+        frames_num = pickle.load(f)
     with open(ACTNET200V13_PKL, 'rb') as f:
         all_groundtruth = pickle.load(f)['database']
+    info = []
+    count = 0
+
     # filter by subset
     remainkeyset = []
     for key in all_groundtruth.keys():
@@ -18,14 +23,6 @@ def load_groundtruth():
     for key in remainkeyset:
         groundtruth[key] = all_groundtruth[key]
     vids = remainkeyset
-    return vids, groundtruth
-
-
-def generdate_frame_info(vids,groundtruth):
-    with open(FRAMES_NUM_PKL, 'rb') as f:
-        frames_num = pickle.load(f)
-    info = []
-    count = 0
     for vid in vids:
         annos = groundtruth[vid]['annotations']
         for anno in annos:
@@ -41,4 +38,4 @@ def generdate_frame_info(vids,groundtruth):
 
 
 if __name__ == '__main__':
-    generdate_frame_info(load_groundtruth())
+    generdate_frame_info()
