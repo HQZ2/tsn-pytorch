@@ -26,7 +26,7 @@ def generdate_frame_info():
     for vid in vids:
         annos = groundtruth[vid]['annotations']
         for anno in annos:
-            label = anno['label']
+            label = anno['class']
             break
         vid2 = 'v_{}.mp4'.format(vid)
         try:
