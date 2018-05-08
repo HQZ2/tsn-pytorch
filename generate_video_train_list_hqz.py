@@ -4,7 +4,7 @@ import os
 FRAMES_NUM_PKL = '/mnt/workspace/pkls/frames_num.pkl'
 ACTNET200V13_PKL = '/mnt/workspace/pkls/actNet200-V1-3.pkl'
 VIDEO_PATH = '/mnt/workspace/activitynet-frames/resized-activitynet-frames'
-SAVE_DIR = '/mnt/workspace/activitynet_train_list.txt'
+SAVE_DIR = '/mnt/workspace/activitynet_val_list.txt'
 
 
 def generdate_frame_info():
@@ -17,7 +17,7 @@ def generdate_frame_info():
     # filter by subset
     remainkeyset = []
     for key in all_groundtruth.keys():
-        if all_groundtruth[key]['subset'] == 'training':
+        if all_groundtruth[key]['subset'] == 'validation':
             remainkeyset.append(key)
     groundtruth = dict()
     for key in remainkeyset:
