@@ -6,7 +6,7 @@ parser.add_argument('train_list', type=str, default='/mnt/workspace/activitynet_
 parser.add_argument('val_list', type=str, default='/mnt/workspace/activitynet_val_list.txt')
 
 # ========================= Model Configs ==========================
-parser.add_argument('--arch', type=str, default="resnet101")
+parser.add_argument('--arch', type=str, default="resnet152")
 parser.add_argument('--num_segments', type=int, default=3)
 parser.add_argument('--consensus_type', type=str, default='avg',
                     choices=['avg', 'max', 'topk', 'identity', 'rnn', 'cnn'])
