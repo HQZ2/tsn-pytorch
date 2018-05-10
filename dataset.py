@@ -22,6 +22,18 @@ class VideoRecord(object):
     def label(self):
         return int(self._data[2])
 
+    @property
+    def duration(self):
+        return float(self._data[3])
+
+    @property
+    def segment_s(self):
+        return self._data[4]
+
+    @property
+    def segment_e(self):
+        return self._data[5]
+
 
 class TSNDataSet(data.Dataset):
     def __init__(self, root_path, list_file,
@@ -66,13 +78,27 @@ class TSNDataSet(data.Dataset):
         :param record: VideoRecord
         :return: list
         """
-        average_duration = (record.num_frames - self.new_length + 1) // self.num_segments
-        if average_duration > 0:
-            offsets = np.multiply(list(range(self.num_segments)), average_duration) + randint(average_duration, size=self.num_segments)
-        elif record.num_frames > self.num_segments:
-            offsets = np.sort(randint(record.num_frames - self.new_length + 1, size=self.num_segments))
+        clip = True
+        if clip is False:
+            average_duration = (record.num_frames - self.new_length + 1) // self.num_segments
+            if average_duration > 0:
+                offsets = np.multiply(list(range(self.num_segments)), average_duration) + randint(average_duration, size=self.num_segments)
+            elif record.num_frames > self.num_segments:
+                offsets = np.sort(randint(record.num_frames - self.new_length + 1, size=self.num_segments))
+            else:
+                offsets = np.zeros((self.num_segments,))
         else:
-            offsets = np.zeros((self.num_segments,))
+            start = float(record.segment_s[1:-1])
+            end = float(record.segment_e[:-1])
+            sf = round(record.num_frames / record.duration * start)
+            ef = round(record.num_frames / record.duration * end)
+            average_duration = (ef - sf - self.new_length + 1) // self.num_segments
+            if average_duration > 0:
+                offsets = sf + np.multiply(list(range(self.num_segments)), average_duration) + randint(average_duration, size=self.num_segments)
+            elif record.num_frames > self.num_segments:
+                offsets = np.sort(randint(record.num_frames - self.new_length + 1, size=self.num_segments))
+            else:
+                offsets = np.zeros((self.num_segments,))
         return offsets + 1
 
     def _get_val_indices(self, record):
