@@ -3,6 +3,7 @@ from ops.basic_ops import ConsensusModule, Identity
 from transforms import *
 from torch.nn.init import normal, constant
 from my_model.group_norm import GroupNorm2d
+from torch.autograd import Variable
 
 # 根据需要改load函数
 def try_load_state_dict(self, state_dict, strict=True):
@@ -31,7 +32,7 @@ def try_load_state_dict(self, state_dict, strict=True):
 
 class TSN(nn.Module):
     def __init__(self, num_class=201, num_segments=3, modality='RGB',
-                 base_model='resnet152', new_length=None,
+                 base_model='dpn107', new_length=None,
                  consensus_type='avg', before_softmax=True,
                  dropout=0.8,
                  crop_num=1, partial_bn=True, use_GN=True):
@@ -166,6 +167,14 @@ TSN Configurations:
         elif 'dpn' in base_model:
             import pytorch_model_zoo
             self.base_model = getattr(pytorch_model_zoo, base_model)()
+            # 提特征
+            self.base_model.try_load_state_dict = try_load_state_dict
+            self.base_model.try_load_state_dict(self.base_model,torch.load('/mnt/workspace/model/dpn107_80e_82.52p.pth.tar')['state_dict'], strict=False)
+            # 调整最后一层
+            # self.base_model.fc = nn.Linear(2048, 201)
+            # 删除多余的函数
+            del self.base_model.try_load_state_dict
+
             self.base_model.last_layer_name = 'classifier' #attention:last layer is a conv
             self.input_size = 224
             self.input_mean =  [124. / 255, 117. / 255, 104. / 255]
@@ -401,5 +410,9 @@ TSN Configurations:
 
 if __name__ == '__main__':
     model = TSN()
-    #....
+    x = torch.randn((12, 3, 224, 224))
+    x = Variable(x)
+    o = model(x)
+
+    print(o.size())
 
