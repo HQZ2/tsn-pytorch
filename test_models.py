@@ -14,11 +14,11 @@ from ops import ConsensusModule
 # options
 parser = argparse.ArgumentParser(
     description="Standard video-level testing")
-parser.add_argument('dataset', type=str, choices=['ucf101', 'hmdb51', 'kinetics', 'ucf-crime'])
+parser.add_argument('dataset', type=str, choices=['ucf101', 'hmdb51', 'kinetics', 'ucf-crime', 'activitynet'])
 parser.add_argument('modality', type=str, choices=['RGB', 'Flow', 'RGBDiff'])
 parser.add_argument('test_list', type=str)
 parser.add_argument('weights', type=str)
-parser.add_argument('--arch', type=str, default="resnet101")
+parser.add_argument('--arch', type=str, default="resnet152")
 parser.add_argument('--save_scores', type=str, default=None)
 parser.add_argument('--test_segments', type=int, default=25)
 parser.add_argument('--max_num', type=int, default=-1)
@@ -44,6 +44,8 @@ elif args.dataset == 'kinetics':
     num_class = 400
 elif args.dataset == 'ucf-crime':
     num_class = 14
+elif args.dataset == 'activitynet':
+    num_class = 201
 else:
     raise ValueError('Unknown dataset '+args.dataset)
 
@@ -90,7 +92,8 @@ if args.gpus is not None:
 else:
     devices = list(range(args.workers))
 
-net = torch.nn.DataParallel(net.cuda(devices[0]), device_ids=devices)
+#net = torch.nn.DataParallel(net.cuda(devices[0]), device_ids=devices)
+net = torch.nn.DataParallel(net, device_ids=args.gpus).cuda()
 net.eval()
 
 data_gen = enumerate(data_loader)

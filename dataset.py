@@ -22,10 +22,11 @@ class VideoRecord(object):
     def label(self):
         return int(self._data[2])
 
+    '''
     @property
     def duration(self):
         return float(self._data[3])
-
+    
     @property
     def segment_s(self):
         return self._data[4]
@@ -33,7 +34,7 @@ class VideoRecord(object):
     @property
     def segment_e(self):
         return self._data[5]
-
+    '''
 
 class TSNDataSet(data.Dataset):
     def __init__(self, root_path, list_file,
@@ -78,7 +79,7 @@ class TSNDataSet(data.Dataset):
         :param record: VideoRecord
         :return: list
         """
-        clip = True
+        clip = False
         if clip is False:
             average_duration = (record.num_frames - self.new_length + 1) // self.num_segments
             if average_duration > 0:
