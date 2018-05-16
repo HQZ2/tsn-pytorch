@@ -46,6 +46,7 @@ def main():
     train_augmentation = model.get_augmentation()
 
     model = torch.nn.DataParallel(model, device_ids=args.gpus).cuda()
+    model.load_state_dict(torch.load('/mnt/workspace/model/activitynet_clip_kinetics600_dpn107_rgb_model/activitynet_clip_600_dpn107_rgb_model_best_074.pth.tar')['state_dict'])
 
     if args.resume:
         if os.path.isfile(args.resume):

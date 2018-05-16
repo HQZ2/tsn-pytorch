@@ -145,7 +145,6 @@ cf = confusion_matrix(video_labels, video_pred).astype(float)
 
 cls_cnt = cf.sum(axis=1)
 cls_hit = np.diag(cf)
-
 cls_acc = cls_hit / cls_cnt
 
 print(cls_acc)

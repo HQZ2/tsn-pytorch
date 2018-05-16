@@ -10,6 +10,7 @@ def try_load_state_dict(self, state_dict, strict=True):
     from torch.nn.parameter import Parameter
     own_state = self.state_dict()
     for name, param in state_dict.items():
+        #import IPython;IPython.embed()
         newname = name.replace('module.base_model.', '')
         if newname in own_state:
             if isinstance(param, Parameter):
@@ -17,6 +18,7 @@ def try_load_state_dict(self, state_dict, strict=True):
                 param = param.data
             try:
                 own_state[newname].copy_(param)
+                #print('...')
             except Exception:
                 raise RuntimeError('While copying the parameter named {}, '
                                    'whose dimensions in the model are {} and '
@@ -133,7 +135,7 @@ TSN Configurations:
             self.base_model = getattr(torchvision.models, base_model)(False)
             # 提特征
             self.base_model.try_load_state_dict = try_load_state_dict
-            self.base_model.try_load_state_dict(self.base_model,torch.load('/mnt/workspace/model/resnet152_30e_72.65p.pth.tar')['state_dict'], strict=False)
+            self.base_model.try_load_state_dict(self.base_model,torch.load('/mnt/workspace/model/activitynet_clip_kinetics600_dpn107_rgb_model/activitynet_clip_600_dpn107_rgb_model_best_074.pth.tar')['state_dict'], strict=False)
             # 调整最后一层
             self.base_model.fc = nn.Linear(2048, 201)
             # 删除多余的函数
@@ -169,7 +171,7 @@ TSN Configurations:
             self.base_model = getattr(pytorch_model_zoo, base_model)()
             # 提特征
             self.base_model.try_load_state_dict = try_load_state_dict
-            self.base_model.try_load_state_dict(self.base_model,torch.load('/mnt/workspace/model/dpn107_80e_82.52p.pth.tar')['state_dict'], strict=False)
+            self.base_model.try_load_state_dict(self.base_model,torch.load('/mnt/workspace/model/activitynet_clip_kinetics600_dpn107_rgb_model/activitynet_clip_600_dpn107_rgb_model_best_074.pth.tar')['state_dict'], strict=False)
             # 调整最后一层
             # self.base_model.fc = nn.Linear(2048, 201)
             # 删除多余的函数
