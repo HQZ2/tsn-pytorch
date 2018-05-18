@@ -20,7 +20,6 @@ best_prec1 = 0
 def main():
     global args, best_prec1
     args = parser.parse_args()
-
     if args.dataset == 'ucf101':
         num_class = 101
     elif args.dataset == 'hmdb51':
@@ -30,7 +29,7 @@ def main():
     elif args.dataset == 'ucf-crime':
         num_class = 14
     elif args.dataset == 'activitynet':
-        num_class = 201
+        num_class = 200
     else:
         raise ValueError('Unknown dataset '+args.dataset)
 
@@ -46,7 +45,7 @@ def main():
     train_augmentation = model.get_augmentation()
 
     model = torch.nn.DataParallel(model, device_ids=args.gpus).cuda()
-    model.load_state_dict(torch.load('/mnt/workspace/model/activitynet_clip_kinetics600_dpn107_rgb_model/activitynet_clip_600_dpn107_rgb_model_best_074.pth.tar')['state_dict'])
+    #model.load_state_dict(torch.load('/mnt/workspace/model/activitynet_clip_kinetics600_dpn107_rgb_model/activitynet_clip_600_dpn107_rgb_model_best_074.pth.tar')['state_dict'])
 
     if args.resume:
         if os.path.isfile(args.resume):
@@ -58,8 +57,8 @@ def main():
                 del pretrained_state['module.new_fc.bias']
                 model_state = model.state_dict()
                 model_state.update(pretrained_state)
-                args.start_epoch = checkpoint['epoch']
-                best_prec1 = checkpoint['best_prec1']
+                #args.start_epoch = checkpoint['epoch']
+                #best_prec1 = checkpoint['best_prec1']
                 model.load_state_dict(model_state)
             else:
                 args.start_epoch = checkpoint['epoch']

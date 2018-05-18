@@ -6,7 +6,7 @@ import json
 FRAMES_NUM_PKL = '/mnt/workspace/pkls/frames_num.pkl'
 ACTNET200V13_PKL = '/mnt/workspace/pkls/actNet200-V1-3.pkl'
 VIDEO_PATH = '/mnt/workspace/activitynet-frames/resized-activitynet-frames'
-SAVE_DIR = '/mnt/workspace/activitynet_info/activitynet_train_clip_all_list.txt'
+SAVE_DIR = '/mnt/workspace/activitynet_info/activitynet_train_clip_all_list200.txt'
 
 
 def generdate_frame_info():
@@ -36,7 +36,7 @@ def generdate_frame_info():
         for anno in annos:
             label = anno['class']
             segment = anno['segment']
-            info.append((os.path.join(VIDEO_PATH, vid2), num, label, duration, segment))
+            info.append((os.path.join(VIDEO_PATH, vid2), num, label-1, duration, segment))
     return info
 
 

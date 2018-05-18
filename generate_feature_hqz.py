@@ -59,7 +59,7 @@ class DataSet(data.Dataset):
                 tran_img = self.transform(seg_imgs)
                 imgs.append(tran_img.numpy())
                 # images[key2] = tran_img
-                idx += 16
+                idx += 8
 
             imgs = np.concatenate(imgs)
             imgs = np.reshape(imgs,(-1,3,224,224))
@@ -72,8 +72,8 @@ class DataSet(data.Dataset):
 class ExtructFeatrue(object):
 
     def __init__(self):
-        saved = torch.load('/mnt/workspace/model/activitynet_kinetics400_resnet152_rgb_model/activitynet_resnet152_rgb_model_best_054.pth.tar')
-        self.model = TSN(201,3,'RGB','resnet152',1)
+        saved = torch.load('/mnt/workspace/model/activitynet_clip_kinetics600_dpn107_rgb_model/activitynet_clip_600_dpn107_rgb_model_best_074.pth.tar')
+        self.model = TSN(201,3,'RGB','dpn107',1)
         self.train_augmentation = self.model.get_augmentation()
         self.input_mean = self.model.input_mean
         self.input_std = self.model.input_std
@@ -107,7 +107,7 @@ if __name__ == '__main__':
     import easydict
     args = easydict.EasyDict()
     args.modality = 'RGB'
-    args.arch ='resnet152'
+    args.arch ='dpn107'
 
     dataset = DataSet(modality=args.modality,
             image_tmpl="image_{:05d}.jpg" if args.modality in ["RGB",
@@ -120,7 +120,7 @@ if __name__ == '__main__':
             ]))
     gen = dataset.nextvideo()
 
-    f = h5py.File('/mnt/workspace/feature/small_RGB_feature.h5', 'w')
+    f = h5py.File('/mnt/workspace/feature/small_RGB_dpn107_feature.h5', 'w')
 
     for idx,item in enumerate(gen):
         vid = item[0]
@@ -150,11 +150,11 @@ if __name__ == '__main__':
 
         mids = np.concatenate(mids)
         clas = np.concatenate(clas)
-
-        f['{}/2048'.format(vid)] = mids
+        #import IPython;IPython.embed()
+        f['{}/2688'.format(vid)] = mids
         f['{}/201'.format(vid)]  = clas
 
-        print(idx,vid)
+        print(idx,vid,flush=True)
 
     f.close()
 
